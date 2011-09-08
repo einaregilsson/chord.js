@@ -153,9 +153,8 @@ Chord.prototype = {
 		r.text(this.boxWidth/2.0, -DOT_WIDTH-NUT_SIZE, this.name, FONT, NAME_FONT_SIZE, 'bottom', 'center');
 	},
 	
-	draw : function(options) {
-		options = options || {};
-		this.renderer.init(this.width, this.height, this.boxWidth);
+	draw : function(scale) {
+		this.renderer.init(this.width, this.height, this.boxWidth, scale);
 		this.drawFretGrid();
 		this.drawNut();
 		this.drawName();
@@ -165,9 +164,9 @@ Chord.prototype = {
 		this.drawBars();
 	},
 	
-	getImage : function(options) {
+	getImage : function(scale) {
 		this.renderer = this.canvasRenderer;
-		this.draw(options);
+		this.draw(scale);
 		var img = document.createElement('img');
 		img.src = this.renderer.canvas.toDataURL();
 		return img;
@@ -260,25 +259,24 @@ Chord.prototype = {
 
 Chord.prototype.canvasRenderer = {
 
-	init : function(width, height, boxWidth) {
+	init : function(width, height, boxWidth, scale) {
 		this.canvas = document.createElement('canvas');
 		var ctx = this.ctx = this.canvas.getContext('2d');
-		this.canvas.width = width;
-		this.canvas.height = height;
+		this.canvas.width = width * scale;
+		this.canvas.height = height * scale;
 
 		
 		ctx.translate(0.5,0.5);
 		ctx.strokeRect(0,0,width-1,height-1);
 
 		ctx.translate((width-boxWidth)/2, NAME_FONT_SIZE + NUT_SIZE + DOT_WIDTH);
-		//ctx.scale(0.6,0.6);
+		if (scale && scale != 1) {
+			ctx.scale(scale, scale);
+		}
 		ctx.lineJoin = 'miter';
 		ctx.lineWidth = LINE_WIDTH;
 		ctx.lineCap = 'square';
 		ctx.strokeStyle = 'black';
-//		if (canvasScale != 1) {
-//			ctx.scale(canvasScale, canvasScale)
-//		}
 	},
 	
 	line : function(x1,y1,x2,y2,width,cap) {
@@ -340,7 +338,7 @@ Chord.render = function(elements) {
 		var chordDef = el.getAttribute('data-chord');
 		var chordName = el.firstChild.nodeValue;
 		if (chordDef && chordDef.match(Chord.regex)) {
-			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getImage(), el.firstChild);
+			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getImage(1), el.firstChild);
 		}
 	}
 }
