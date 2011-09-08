@@ -1,20 +1,10 @@
-var CELL_WIDTH = 10;
-var CELL_HEIGHT = 10;
-var NUT_SIZE = CELL_HEIGHT / 2.0;
-var LINE_WIDTH = 1;
-var HALF_LINE_WIDTH = LINE_WIDTH / 2.0;
-var DOT_RADIUS = Math.floor(0.45*CELL_WIDTH);
-var NUT_SIZE = 3;
-var DOT_WIDTH = 2*DOT_RADIUS;
-var X = CELL_WIDTH*2;
-var Y = CELL_HEIGHT*2;
-var MUTED = -1;
-var NAME_FONT_SIZE = 18;
-var FONT = 'Arial';
+
 
 function Chord(canvas, name, positions, fingering) {
 	this.init(canvas, name, positions, fingering);
 }
+var MUTED = -1;
+
 
 //Matches a named chord with optional fingerings
 //              |Small      |Large chord with seperators            |        |Optional|
@@ -22,7 +12,7 @@ function Chord(canvas, name, positions, fingering) {
 Chord.regex = /([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|\d\d?)){3,5})\b(\s*\[([T\d]+)\])?/g;
 
 Chord.prototype = {
-	init : function(name, positions, fingers, scale) {
+	init : function(name, positions, fingers) {
 		this.parse(positions, fingers);
 		this.name = name;
 		this.renderer = this.canvasRenderer;
@@ -39,19 +29,14 @@ Chord.prototype = {
 			raw = frets.split(/[^\dxX]/);
 		}
 		this.stringCount = raw.length;
-		this.boxWidth = (this.stringCount-1)*CELL_WIDTH;
 		if (this.stringCount == 4) {
 			this.fretCount = 4;
 		} else {
 			this.fretCount = 5;
 		}
-		this.boxHeight = (this.fretCount-1)*CELL_HEIGHT;
 		var maxFret = 0;
 		var minFret = 1000;
-		
-		this.width = this.boxWidth + 3*CELL_WIDTH;
-		this.height = this.boxHeight + NAME_FONT_SIZE + NUT_SIZE + DOT_WIDTH + CELL_HEIGHT*2.4;
-		
+				
 		for (var i in raw) {
 			var c = raw[i];
 			if (c.toLowerCase() == 'x') {
@@ -88,34 +73,34 @@ Chord.prototype = {
 		}
 	},
 	
-	drawMutedAndOpenStrings : function() {
+	drawMutedAndOpenStrings : function(info) {
 		var r = this.renderer;
 		for (var i in this.positions) {
 			var pos = this.positions[i];
-			var x = i*CELL_WIDTH;
-			var y = -NUT_SIZE*1.3 - DOT_RADIUS;
-			var y = -NUT_SIZE*1.3 - DOT_RADIUS;
+			var x = i*info.cellWidth;
+			var y = -info.nutSize*1.3 - info.dotRadius;
+			var y = -info.nutSize*1.3 - info.dotRadius;
 			if (this.startFret > 1) {
-				y+=NUT_SIZE;
+				y+=info.nutSize;
 			}
 			if (pos == MUTED) {
-				this.drawCross(x,y,DOT_RADIUS);
+				this.drawCross(info,x,y,info.dotRadius);
 			} else if (pos == 0) {
-				r.circle(x,y,DOT_RADIUS);
+				r.circle(x,y,info.dotRadius);
 			}
 		}
 	},
 	
-	drawPositions : function() {
+	drawPositions : function(info) {
 		var r = this.renderer;
 		for (var i in this.positions) {
 			var pos = this.positions[i];
 			if (pos > 0) {
 				var relativePos = pos - this.startFret+1;
-				var x = i*CELL_WIDTH;
+				var x = i*info.cellWidth;
 				if (relativePos <= 5) {
-					var y = relativePos*CELL_HEIGHT-(CELL_HEIGHT/2)
-					r.circle(x,y,DOT_RADIUS,true);
+					var y = relativePos*info.cellHeight-(info.cellHeight/2)
+					r.circle(x,y,info.dotRadius,true);
 				}
 			}
 		}
@@ -125,43 +110,59 @@ Chord.prototype = {
 		return 'Chord';
 	},
 	
-	drawFretGrid : function() {
+	drawFretGrid : function(info) {
 		var r = this.renderer;
-		var width = (this.stringCount-1)*CELL_WIDTH;
+		var width = (this.stringCount-1)*info.cellWidth;
 		for (var i = 0; i <= this.stringCount-1; i++) {
-			var x = i*CELL_WIDTH;
-			r.line(x,0,x,this.fretCount*CELL_HEIGHT);
+			var x = i*info.cellWidth;
+			r.line(x,0,x,this.fretCount*info.cellHeight);
 		}
 		
 		for (var i = 0; i <= this.fretCount; i++) {
-			var y = i*CELL_HEIGHT;
+			var y = i*info.cellHeight;
 			r.line(0,y,width,y);
 		}
 	},
 	
-	drawNut : function() {
+	drawNut : function(info) {
 		var r = this.renderer;
 		if (this.startFret == 1) {
-			r.rect(0,-NUT_SIZE,this.boxWidth,NUT_SIZE,true);
+			r.rect(0,-info.nutSize,info.boxWidth,info.nutSize,true);
 		} else {
-			r.text(-CELL_WIDTH, CELL_HEIGHT / 2.0, this.startFret+'', FONT, CELL_HEIGHT, 'middle', 'right');
+			r.text(-info.cellWidth, info.cellHeight / 2.0, this.startFret+'', info.font, info.cellHeight, 'middle', 'right');
 		}
 	},
 	
-	drawName : function() {
+	drawName : function(info) {
 		var r = this.renderer;
-		r.text(this.boxWidth/2.0, -DOT_WIDTH-NUT_SIZE, this.name, FONT, NAME_FONT_SIZE, 'bottom', 'center');
+		r.text(info.boxWidth/2.0, -info.dotWidth-info.nutSize, this.name, info.font, info.nameFontSize, 'bottom', 'center');
 	},
 	
 	draw : function(scale) {
-		this.renderer.init(this.width, this.height, this.boxWidth, scale);
-		this.drawFretGrid();
-		this.drawNut();
-		this.drawName();
-		this.drawMutedAndOpenStrings();
-		this.drawPositions();
-		this.drawFingerings();
-		this.drawBars();
+	
+		var info ={};
+		info.cellWidth = Math.round(4*scale);
+		info.cellHeight = info.cellWidth;
+		info.nutSize = Math.round(info.cellHeight * 0.4);
+		info.lineWidth = Math.floor(scale);
+		info.dotRadius = Math.round(0.4*info.cellWidth,1); 
+		info.dotWidth = 2*info.dotRadius;
+		info.font = 'Arial';
+		info.nameFontSize = Math.round(1.8*info.cellHeight);;
+		info.boxWidth = (this.stringCount-1)*info.cellWidth;
+		info.boxHeight = (this.fretCount-1)*info.cellHeight;
+		info.width = info.boxWidth + 3*info.cellWidth;
+		info.height = info.boxHeight + info.nameFontSize + info.nutSize + info.dotWidth + Math.round(info.cellHeight*2.4);
+		info.originX = Math.round(((info.width-info.boxWidth)/2)*scale);
+		info.originY = Math.round((info.nameFontSize + info.nutSize + info.dotWidth)*scale);	
+		this.renderer.init(info);
+		this.drawFretGrid(info);
+		this.drawNut(info);
+		this.drawName(info);
+		this.drawMutedAndOpenStrings(info);
+		this.drawPositions(info);
+		this.drawFingerings(info);
+		this.drawBars(info);
 	},
 	
 	getImage : function(scale) {
@@ -172,7 +173,7 @@ Chord.prototype = {
 		return img;
 	},
 	
-	drawBars : function() {
+	drawBars : function(info) {
 		var r = this.renderer;
 		if (this.fingerings.length>0) {
 			var bars = {};
@@ -188,11 +189,11 @@ Chord.prototype = {
 			}
 			for (var fret in bars) {
 				if (bars[fret].length > 0) {
-					var xStart = bars[fret].index * CELL_WIDTH;
-					var xEnd = xStart+bars[fret].length*CELL_WIDTH;
+					var xStart = bars[fret].index * info.cellWidth;
+					var xEnd = xStart+bars[fret].length*info.cellWidth;
 					var relativePos = fret - this.startFret+1;
-					var y = relativePos*CELL_HEIGHT-(CELL_HEIGHT/2);
-					r.line(xStart,y,xEnd,y, DOT_RADIUS);
+					var y = relativePos*info.cellHeight-(info.cellHeight/2);
+					r.line(xStart,y,xEnd,y, info.dotRadius);
 				}
 			}
 
@@ -219,16 +220,16 @@ Chord.prototype = {
 				}
 			}
 			if (startIndex >= 0) {
-				var xStart = startIndex * CELL_WIDTH;
-				var xEnd = (this.positions.length-1)*CELL_WIDTH;
+				var xStart = startIndex * info.cellWidth;
+				var xEnd = (this.positions.length-1)*info.cellWidth;
 				var relativePos = barFret - this.startFret+1;
-				var y = relativePos*CELL_HEIGHT-(CELL_HEIGHT/2);
-				r.line(xStart,y,xEnd,y, DOT_RADIUS);
+				var y = relativePos*info.cellHeight-(info.cellHeight/2);
+				r.line(xStart,y,xEnd,y, info.dotRadius);
 			}
 		}
 	},
 	
-	drawCross : function(x, y, radius) {
+	drawCross : function(info, x, y, radius) {
 		var r = this.renderer;
 		var angle = Math.PI/4
 		for (var i = 0; i < 2; i++) {
@@ -239,19 +240,19 @@ Chord.prototype = {
 			var startY = y + radius * Math.sin(startAngle);
 			var endX = x + radius * Math.cos(endAngle);
 			var endY = y + radius * Math.sin(endAngle);
-			r.line(startX,startY,endX,endY,1.5*LINE_WIDTH,'round');
+			r.line(startX,startY,endX,endY,1.5*info.lineWidth,'round');
 		}
 	},
 	
-	drawFingerings : function() {
+	drawFingerings : function(info) {
 		var r = this.renderer;
-		var fontSize = CELL_HEIGHT;
+		var fontSize = info.cellHeight*1.4;
 		for (var i in this.fingerings) {
 			var finger = this.fingerings[i]
-			var x = i*CELL_WIDTH;
-			var y = this.fretCount*CELL_HEIGHT;
+			var x = i*info.cellWidth;
+			var y = this.fretCount*info.cellHeight;
 			if (finger) {
-				r.text(x,y,finger, FONT, fontSize, 'top', 'center');
+				r.text(x,y,finger, info.font, fontSize, 'top', 'center');
 			} 
 		}
 	}
@@ -259,34 +260,30 @@ Chord.prototype = {
 
 Chord.prototype.canvasRenderer = {
 
-	init : function(width, height, boxWidth, scale) {
+	init : function(info) {
 		this.canvas = document.createElement('canvas');
 		var ctx = this.ctx = this.canvas.getContext('2d');
-		this.canvas.width = width * scale;
-		this.canvas.height = height * scale;
-
-		if ((scale >= 1 &&scale % 2 == 1)) {
-			ctx.translate(0.5,0.5);
+		this.canvas.width = info.width;
+		this.canvas.height = info.width;
+		
+		if (info.lineWidth%2==1){
+			ctx.translate(-0.5,-0.5);
 		}
 		ctx.strokeRect(0,0,this.canvas.width-1,this.canvas.height-1);
 
-		ctx.translate(((width-boxWidth)/2)*scale, (NAME_FONT_SIZE + NUT_SIZE + DOT_WIDTH)*scale);
-		if (scale && scale != 1) {
-			ctx.scale(scale, scale);
-		}
+		ctx.translate(info.originX, info.originY);
 		ctx.lineJoin = 'miter';
-		ctx.lineWidth = LINE_WIDTH;
+		ctx.lineWidth = info.lineWidth;
 		ctx.lineCap = 'square';
 		ctx.strokeStyle = 'black';
 	},
 	
 	line : function(x1,y1,x2,y2,width,cap) {
 		var c = this.ctx;
-		if (width % 2 == 0) {
-			width++;
-		}
 		c.save();
-		c.lineWidth = width || LINE_WIDTH;
+		if (width) {
+			c.lineWidth = width;
+		}
 		c.lineCap = cap || 'square';
 		c.beginPath();
 		c.moveTo(x1,y1);
