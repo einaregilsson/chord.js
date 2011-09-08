@@ -265,11 +265,12 @@ Chord.prototype.canvasRenderer = {
 		this.canvas.width = width * scale;
 		this.canvas.height = height * scale;
 
-		
-		ctx.translate(0.5,0.5);
-		ctx.strokeRect(0,0,width-1,height-1);
+		if ((scale >= 1 &&scale % 2 == 1)) {
+			ctx.translate(0.5,0.5);
+		}
+		ctx.strokeRect(0,0,this.canvas.width-1,this.canvas.height-1);
 
-		ctx.translate((width-boxWidth)/2, NAME_FONT_SIZE + NUT_SIZE + DOT_WIDTH);
+		ctx.translate(((width-boxWidth)/2)*scale, (NAME_FONT_SIZE + NUT_SIZE + DOT_WIDTH)*scale);
 		if (scale && scale != 1) {
 			ctx.scale(scale, scale);
 		}
