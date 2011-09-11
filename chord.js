@@ -349,6 +349,50 @@ Chord.renderers.canvas = {
 	}
 };
 
+Chord.renderers.svg = {
+
+	init : function(info) {
+		this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		this.svg.setAttribute('width', info.width);
+		this.svg.setAttribute('height', info.height);
+		this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		this.group.setAttribute('transform', 'translate(0.5,0.5)');
+		this.svg.appendChild(this.group);
+	},
+	
+	line : function(x1,y1,x2,y2,width,cap) {
+		var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+		line.x1.baseVal.value = x1;
+		line.x2.baseVal.value = x2;
+		line.y1.baseVal.value = y1;
+		line.y2.baseVal.value = y2;
+		line.setAttribute('stroke', 'black');
+		line.setAttribute('stroke-width', width);
+		this.group.appendChild(line);
+	},
+	
+	text : function(x,y,text,font,size,baseline,align) {
+	},
+	
+	rect : function(x,y,width,height,fillRect) {
+	},
+	
+	circle : function(x,y,radius, fillCircle) {
+		var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+		circle.cx.baseVal.value = x;
+		circle.cy.baseVal.value = y;
+		circle.r.baseVal.value = radius;
+		circle.setAttribute('fill', 'black');
+		circle.setAttribute('stroke-width', 1);
+		this.group.appendChild(circle);
+	},
+	
+	diagram : function() {
+		return this.svg;
+	}
+};
+
+
 if (document.addEventListener) {
 	document.addEventListener('DOMContentLoaded', function() {
 		Chord.render(document.getElementsByTagName('span'));
@@ -366,7 +410,7 @@ Chord.render = function(elements) {
 			if (RegExp.$4) {
 				size = parseInt(RegExp.$4);
 			}
-			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getDiagram(size), el.firstChild);
+			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getDiagram(size,'svg'), el.firstChild);
 		}
 	}
 }
