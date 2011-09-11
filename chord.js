@@ -184,12 +184,10 @@ Chord.prototype = {
 		*/
 	},
 	
-	getImage : function(scale) {
-		this.renderer = this.canvasRenderer;
+	getDiagram : function(scale, renderer) {
+		this.renderer = Chord.renderers[renderer || 'canvas'];
 		this.draw(scale);
-		var img = document.createElement('img');
-		img.src = this.renderer.canvas.toDataURL();
-		return img;
+		return this.renderer.diagram();
 	},
 	
 	drawBars : function(info) {
@@ -282,7 +280,9 @@ Chord.prototype = {
 	}
 }
 
-Chord.prototype.canvasRenderer = {
+Chord.renderers = {}; 
+
+Chord.renderers.canvas = {
 
 	init : function(info) {
 		this.canvas = document.createElement('canvas');
@@ -333,13 +333,19 @@ Chord.prototype.canvasRenderer = {
 	circle : function(x,y,radius, fillCircle) {
 		var c = this.ctx;
 		c.beginPath();
-		radius = Math.floor(radius);
+		radius = Math.floor(radius) ;
 		c.arc(x,y,radius,2*Math.PI,false)
 		if (fillCircle) {
 			c.fill();
 		} else {
 			c.stroke();
 		}
+	},
+	
+	diagram : function() {
+		var img = document.createElement('img');
+		img.src = this.canvas.toDataURL();
+		return img;
 	}
 };
 
@@ -360,7 +366,7 @@ Chord.render = function(elements) {
 			if (RegExp.$4) {
 				size = parseInt(RegExp.$4);
 			}
-			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getImage(size), el.firstChild);
+			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getDiagram(size), el.firstChild);
 		}
 	}
 }
