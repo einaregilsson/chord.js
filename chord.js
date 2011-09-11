@@ -9,7 +9,7 @@ var MUTED = -1;
 //Matches a named chord with optional fingerings
 //              |Small      |Large chord with seperators            |        |Optional|
 //              |Chord      |dashes, dots or spaces                 |        |Fingerings
-Chord.regex = /([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|\d\d?)){3,5})\b(\s*\[([T\d]+)\])?(\s+(\d+(?:\.\d+)?))?/g;
+Chord.regex = /([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|\d\d?)){3,5})\b(\s*\[([T\d]+)\])?(\s+(\d+))?/g;
 
 Chord.prototype = {
 	init : function(name, positions, fingers) {
@@ -78,7 +78,7 @@ Chord.prototype = {
 		for (var i in this.positions) {
 			var pos = this.positions[i];
 			var x = info.boxStartX+i*info.cellWidth;
-			var y = info.nameFontSize + info.nameFontPaddingBottom + info.dotRadius;
+			var y = info.nameFontSize + info.nameFontPaddingBottom + info.dotRadius-2;
 			if (this.startFret > 1) {
 				y+=info.nutSize;
 			}
@@ -137,25 +137,30 @@ Chord.prototype = {
 		r.text(info.width/2.0, 0, this.name, info.font, info.nameFontSize, 'top', 'center');
 	},
 	
-	draw : function(scale) {
-	
+	calculateDimensions : function(scale) {
 		var info ={};
-		info.cellWidth = Math.ceil(4*scale);
+		info.scale = scale;
+		info.cellWidth = scale + 3;
 		info.cellHeight = info.cellWidth;
 		info.nutSize = Math.round(info.cellHeight * 0.4);
-		info.lineWidth = Math.floor(scale);
+		info.lineWidth = Math.max(1.0,Math.floor(info.cellHeight/6.0));
 		info.dotRadius = Math.round(0.35*info.cellWidth,1); 
 		info.dotWidth = 2*info.dotRadius;
 		info.font = 'Arial';
 		info.nameFontSize = Math.round(1.8*info.cellHeight);
 		info.nameFontPaddingBottom = 4;
-		info.fingerFontSize = Math.round(info.cellHeight*1.4);
+		info.fingerFontSize = Math.round(info.cellHeight*1.2);
 		info.boxWidth = (this.stringCount-1)*info.cellWidth;
 		info.boxHeight = (this.fretCount)*info.cellHeight;
 		info.width = info.boxWidth + 3*info.cellWidth;
-		info.height = info.nameFontSize + info.nameFontPaddingBottom + info.dotWidth + info.nutSize + info.boxHeight + info.fingerFontSize;
+		info.height = info.nameFontSize + info.nameFontPaddingBottom + info.dotWidth + info.nutSize + info.boxHeight + info.fingerFontSize + 2;
 		info.boxStartX = Math.round(((info.width-info.boxWidth)/2));
 		info.boxStartY = Math.round(info.nameFontSize + info.nameFontPaddingBottom + info.nutSize + info.dotWidth);	
+		return info;
+	},
+	
+	draw : function(scale) {
+		var info = this.calculateDimensions(scale);
 		this.renderer.init(info);
 		this.drawFretGrid(info);
 		this.drawNut(info);
@@ -203,10 +208,10 @@ Chord.prototype = {
 			}
 			for (var fret in bars) {
 				if (bars[fret].length > 0) {
-					var xStart = bars[fret].index * info.cellWidth;
+					var xStart = info.boxStartX+bars[fret].index * info.cellWidth;
 					var xEnd = xStart+bars[fret].length*info.cellWidth;
 					var relativePos = fret - this.startFret+1;
-					var y = relativePos*info.cellHeight-(info.cellHeight/2);
+					var y = info.boxStartY+relativePos*info.cellHeight-(info.cellHeight/2);
 					r.line(xStart,y,xEnd,y, info.dotRadius);
 				}
 			}
@@ -234,10 +239,10 @@ Chord.prototype = {
 				}
 			}
 			if (startIndex >= 0) {
-				var xStart = startIndex * info.cellWidth;
+				var xStart = info.boxStartX+startIndex * info.cellWidth;
 				var xEnd = (this.positions.length-1)*info.cellWidth;
 				var relativePos = barFret - this.startFret+1;
-				var y = relativePos*info.cellHeight-(info.cellHeight/2);
+				var y = info.boxStartY+relativePos*info.cellHeight-(info.cellHeight/2);
 				r.line(xStart,y,xEnd,y, info.dotRadius);
 			}
 		}
@@ -246,6 +251,10 @@ Chord.prototype = {
 	drawCross : function(info, x, y, radius) {
 		var r = this.renderer;
 		var angle = Math.PI/4
+		var lineWidth = info.lineWidth;
+		if (info.scale > 2 ) {
+			lineWidth *= 1.2;
+		}
 		for (var i = 0; i < 2; i++) {
 			var startAngle = angle + i*Math.PI/2;
 			var endAngle = startAngle + Math.PI;
@@ -254,7 +263,8 @@ Chord.prototype = {
 			var startY = y + radius * Math.sin(startAngle);
 			var endX = x + radius * Math.cos(endAngle);
 			var endY = y + radius * Math.sin(endAngle);
-			r.line(startX,startY,endX,endY,1.5*info.lineWidth,'round');
+			
+			r.line(startX,startY,endX,endY,lineWidth,'round');
 		}
 	},
 	
@@ -306,7 +316,7 @@ Chord.prototype.canvasRenderer = {
 	},
 	
 	text : function(x,y,text,font,size,baseline,align) {
-		this.ctx.font = size + 'px ' + font + ' bold';
+		this.ctx.font = size + 'px ' + font;
 		this.ctx.textBaseline = baseline;
 		this.ctx.textAlign = align;
 		this.ctx.fillText(text,x,y)
@@ -323,10 +333,7 @@ Chord.prototype.canvasRenderer = {
 	circle : function(x,y,radius, fillCircle) {
 		var c = this.ctx;
 		c.beginPath();
-		if (!fillCircle) {
-			radius -= c.lineWidth;
-		}
-		radius = Math.floor(radius)+0.5;
+		radius = Math.floor(radius);
 		c.arc(x,y,radius,2*Math.PI,false)
 		if (fillCircle) {
 			c.fill();
@@ -351,7 +358,7 @@ Chord.render = function(elements) {
 		if (chordDef && chordDef.match(Chord.regex)) {
 			var size = 1;
 			if (RegExp.$4) {
-				size = parseFloat(RegExp.$4);
+				size = parseInt(RegExp.$4);
 			}
 			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getImage(size), el.firstChild);
 		}
