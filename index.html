@@ -1,24 +1,54 @@
 <!DOCTYPE html>
 <html>
-<head>
-<script src="chord.js"></script>
-</head>
-<body>
-This is some text talking about an <span data-chord="24-24-x-x-x-x [231]">E7</span> chord and an <span data-chord="x02220">A7</span> chord.
-Also, an ukulele <span data-chord="0232">C</span> chord.
-<span data-chord="0232">G</span> <span data-chord="12-12-11-12">B7</span>.<br>
+	<head>
+		<style type="text/css">
+			body { background-color:#eee; font-family:Arial, sans-serif; }
+		</style>
+		<script src="chord.js"></script>
+	</head>
+	<body>
+		<h3>Simple chords</h3>
+		<!-- As simple as can be, just the base chord. Uses Chord.defaultSize and Chord.defaultRenderer. Set them in code to always use your defaults -->
+		<span data-chord="320033">G</span> 
+		<!-- Almost as simple, but includes the fingers used to make the chords. Still uses defaults for size and rendering -->
+		<span data-chord="x32010 [321]">C</span> 
+		<!-- Simple chord, but specify the size explicitly -->
+		<span data-chord="xx0232 5">D</span> 
+		<!-- Simple chord, but specify the rendering explicitly -->
+		<span data-chord="022000 svg">Em</span> 
+		<!-- Specify chord, fingers and rendering, not size -->
+		<span data-chord="577655 [134211] canvas">A</span> 
+		<!-- Specify chord with fret numbers larger than 9, and rendering, not fingers -->
+		<span data-chord="24 26 26 25 0 0 canvas">E</span> 
+		<!-- Alternate way to specify chord with fret numbers larger than 9 -->
+		<span data-chord="10-12-12-11-10-10 [134211] 5">D</span> 
+		
 
-<span data-chord="10 12 12 11 x 0 [2] 1">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 2">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 3">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 4">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 5">C</span><br>
-<span data-chord="x32010 [232] 5">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 6">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 7">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 8">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 9">C</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 10">E7sus4</span><br>
-<span data-chord="10 12 12 11 x 0 [2] 11">Bbm/G</span><br>
-</body>
+		<!--A bunch of Canvas rendered chords, fully specified in different sizes-->
+		<h3>Canvas chords</h3>
+		<span data-chord="320033 [2134] 1 canvas">G</span> 
+		<span data-chord="x32010 [321] 2 canvas">C</span> 
+		<span data-chord="xx0232 [132] 3 canvas">D</span> 
+		<span data-chord="022000 [12] 4 canvas">Em</span> 
+		<span data-chord="577655 [134211] 5 canvas">A</span> 
+		<span data-chord="24 26 26 25 0 0 [1342] 6 canvas">E</span> 
+		<span data-chord="x32030 [213] 7 canvas">Cadd9</span> 
+		<span data-chord="x46654 [13421] 8 canvas">C#m</span> 
+		<span data-chord="x7678x [2134] 9 canvas">E7#9</span> 
+		<span data-chord="577555 [134111] 10 canvas">Am</span> 
+
+		<!--A bunch of SVG rendered chords, fully specified in different sizes-->
+		<h3>SVG chords</h3>
+		<span data-chord="320033 [2134] 1 svg">G</span> 
+		<span data-chord="x32010 [321] 2 svg">C</span> 
+		<span data-chord="xx0232 [132] 3 svg">D</span> 
+		<span data-chord="022000 [12] 4 svg">Em</span> 
+		<span data-chord="577655 [134211] 5 svg">A</span> 
+		<span data-chord="24 26 26 25 0 0 [1342] 6 svg">E</span> 
+		<span data-chord="x32030 [213] 7 svg">Cadd9</span> 
+		<span data-chord="x46654 [13421] 8 svg">C#m</span> 
+		<span data-chord="x7678x [2134] 9 svg">E7#9</span> 
+		<span data-chord="577555 [134111] 10 svg">Am</span> 
+
+	</body>
 </html>

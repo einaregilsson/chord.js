@@ -9,7 +9,7 @@ var MUTED = -1;
 //Matches a named chord with optional fingerings
 //              |Small      |Large chord with seperators            |        |Optional|
 //              |Chord      |dashes, dots or spaces                 |        |Fingerings
-Chord.regex = /([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|\d\d?)){3,5})\b(\s*\[([T\d]+)\])?(\s+(\d+))?/g;
+Chord.regex = /([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|\d\d?)){3,5})\b(?:\s*\[([T\d]+)\])?(?:\s+(\d+))?(?:\s+(.*)\b)?/g;
 
 Chord.prototype = {
 	init : function(name, positions, fingers) {
@@ -280,6 +280,11 @@ Chord.prototype = {
 	}
 }
 
+//Defaults
+
+Chord.defaultSize = 3;
+Chord.defaultRenderer = 'canvas'; 
+
 Chord.renderers = {}; 
 
 Chord.renderers.canvas = {
@@ -293,7 +298,9 @@ Chord.renderers.canvas = {
 		if (info.lineWidth%2==1){
 			ctx.translate(0.5,0.5);
 		}
-		ctx.strokeRect(0,0,this.canvas.width-1,this.canvas.height-1);
+		ctx.fillStyle = 'white';
+		ctx.fillRect(-1,-1,this.canvas.width+2,this.canvas.height+2);
+		ctx.fillStyle = 'black';
 
 		ctx.lineJoin = 'miter';
 		ctx.lineWidth = info.lineWidth;
@@ -355,8 +362,10 @@ Chord.renderers.svg = {
 		this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		this.svg.setAttribute('width', info.width);
 		this.svg.setAttribute('height', info.height);
+		this.svg.setAttribute('style', 'background-color:white;');
 		this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		this.group.setAttribute('transform', 'translate(0.5,0.5)');
+		this.group.setAttribute('stroke-linejoin', 'miter');
 		this.svg.appendChild(this.group);
 	},
 	
@@ -372,9 +381,24 @@ Chord.renderers.svg = {
 	},
 	
 	text : function(x,y,text,font,size,baseline,align) {
+		var textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		textNode.x.baseVal.value = x;
+		textNode.y.baseVal.value = y;
+		textNode.setAttribute('font-family', font);
+		textNode.setAttribute('font-size', size + 'px');
+		textNode.setAttribute('baseline', baseline);
+		textNode.appendChild(document.createTextNode(text));
+		this.group.appendChild(textNode);
 	},
 	
 	rect : function(x,y,width,height,fillRect) {
+		var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+		rect.x.baseVal.value = x-0.5;
+		rect.y.baseVal.value = y-0.5;
+		rect.width.baseVal.value = width+1;
+		rect.height.baseVal.value = height+1;
+		rect.setAttribute('fill', 'black');
+		this.group.appendChild(rect);
 	},
 	
 	circle : function(x,y,radius, fillCircle) {
@@ -382,8 +406,11 @@ Chord.renderers.svg = {
 		circle.cx.baseVal.value = x;
 		circle.cy.baseVal.value = y;
 		circle.r.baseVal.value = radius;
-		circle.setAttribute('fill', 'black');
-		circle.setAttribute('stroke-width', 1);
+		if (fillCircle) {
+			circle.setAttribute('fill', 'black');
+		} else {
+			circle.setAttribute('stroke-width', 1);
+		}
 		this.group.appendChild(circle);
 	},
 	
@@ -406,11 +433,13 @@ Chord.render = function(elements) {
 		var chordDef = el.getAttribute('data-chord');
 		var chordName = el.firstChild.nodeValue;
 		if (chordDef && chordDef.match(Chord.regex)) {
-			var size = 1;
-			if (RegExp.$4) {
-				size = parseInt(RegExp.$4);
+			var size = Chord.defaultSize;
+			if (RegExp.$3) {
+				size = parseInt(RegExp.$3);
 			}
-			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$3).getDiagram(size,'svg'), el.firstChild);
+			var renderer = RegExp.$4 || Chord.defaultRenderer;
+			
+			el.replaceChild(new Chord(chordName, RegExp.$1, RegExp.$2).getDiagram(size, renderer), el.firstChild);
 		}
 	}
 }
