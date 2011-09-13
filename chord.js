@@ -114,12 +114,12 @@ Chord.prototype = {
 		var width = (this.stringCount-1)*info.cellWidth;
 		for (var i = 0; i <= this.stringCount-1; i++) {
 			var x = info.boxStartX+i*info.cellWidth;
-			r.line(x,info.boxStartY,x,info.boxStartY+this.fretCount*info.cellHeight);
+			r.line(x,info.boxStartY,x,info.boxStartY+this.fretCount*info.cellHeight, info.lineWidth);
 		}
 		
 		for (var i = 0; i <= this.fretCount; i++) {
 			var y = info.boxStartY+i*info.cellHeight;
-			r.line(info.boxStartX,y,info.boxStartX+width,y);
+			r.line(info.boxStartX,y,info.boxStartX+width,y, info.lineWidth);
 		}
 	},
 	
@@ -144,12 +144,24 @@ Chord.prototype = {
 		info.cellHeight = info.cellWidth;
 		info.nutSize = Math.round(info.cellHeight * 0.4);
 		info.lineWidth = Math.max(1.0,Math.floor(info.cellHeight/6.0));
-		info.dotRadius = Math.round(0.35*info.cellWidth,1); 
+		info.dotRadius = info.cellWidth/2-1;
+		if (scale <= 4) {
+			info.dotRadius++;
+		}
 		info.dotWidth = 2*info.dotRadius;
 		info.font = 'Arial';
 		info.nameFontSize = Math.round(1.8*info.cellHeight);
+		if (scale <= 4) {
+			info.nameFontSize +=2;
+		}
 		info.nameFontPaddingBottom = 4;
 		info.fingerFontSize = Math.round(info.cellHeight*1.2);
+		if (scale <= 4) {
+			info.fingerFontSize++;
+		}
+		if (scale == 1) {
+			info.fingerFontSize++;
+		}
 		info.boxWidth = (this.stringCount-1)*info.cellWidth;
 		info.boxHeight = (this.fretCount)*info.cellHeight;
 		info.width = info.boxWidth + 3*info.cellWidth;
@@ -169,19 +181,6 @@ Chord.prototype = {
 		this.drawPositions(info);
 		this.drawFingerings(info);
 		this.drawBars(info);
-		
-		/*
-		y = info.nameFontSize
-		this.renderer.line(0,y,info.width, y);
-		y += info.dotWidth;
-		this.renderer.line(0,y,info.width, y);
-		y += info.nutSize;
-		this.renderer.line(0,y,info.width, y);
-		y += info.boxHeight;
-		this.renderer.line(0,y,info.width, y);
-		y += info.fingerFontSize;
-		this.renderer.line(0,y,info.width, y);
-		*/
 	},
 	
 	getDiagram : function(scale, renderer) {
@@ -357,20 +356,26 @@ Chord.renderers.canvas = {
 };
 
 Chord.renderers.svg = {
-
+	
+	newElement : function(name) {
+		return document.createElementNS("http://www.w3.org/2000/svg", name);
+	},
+	
 	init : function(info) {
-		this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		this.svg = this.newElement('svg');
 		this.svg.setAttribute('width', info.width);
 		this.svg.setAttribute('height', info.height);
 		this.svg.setAttribute('style', 'background-color:white;');
 		this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-		this.group.setAttribute('transform', 'translate(0.5,0.5)');
+		if (info.lineWidth%2==1) {
+			this.group.setAttribute('transform', 'translate(0.5,0.5)');
+		}
 		this.group.setAttribute('stroke-linejoin', 'miter');
 		this.svg.appendChild(this.group);
 	},
 	
 	line : function(x1,y1,x2,y2,width,cap) {
-		var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+		var line = this.newElement('line');
 		line.x1.baseVal.value = x1;
 		line.x2.baseVal.value = x2;
 		line.y1.baseVal.value = y1;
@@ -381,7 +386,7 @@ Chord.renderers.svg = {
 	},
 	
 	text : function(x,y,text,font,size,baseline,align) {
-		var textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		var textNode = this.newElement('text');
 		textNode.x.baseVal.value = x;
 		textNode.y.baseVal.value = y;
 		textNode.setAttribute('font-family', font);
@@ -392,7 +397,7 @@ Chord.renderers.svg = {
 	},
 	
 	rect : function(x,y,width,height,fillRect) {
-		var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+		var rect = this.newElement('rect');
 		rect.x.baseVal.value = x-0.5;
 		rect.y.baseVal.value = y-0.5;
 		rect.width.baseVal.value = width+1;
@@ -402,14 +407,15 @@ Chord.renderers.svg = {
 	},
 	
 	circle : function(x,y,radius, fillCircle) {
-		var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+		var circle = this.newElement('circle');
 		circle.cx.baseVal.value = x;
 		circle.cy.baseVal.value = y;
 		circle.r.baseVal.value = radius;
 		if (fillCircle) {
 			circle.setAttribute('fill', 'black');
 		} else {
-			circle.setAttribute('stroke-width', 1);
+			circle.setAttribute('fill', 'white');
+			circle.setAttribute('stroke', 'black');
 		}
 		this.group.appendChild(circle);
 	},
