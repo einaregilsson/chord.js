@@ -84,7 +84,7 @@ Chord.prototype = {
 			if (pos == MUTED) {
 				this.drawCross(info,x,y,info.dotRadius);
 			} else if (pos == 0) {
-				r.circle(x,y,info.dotRadius);
+				r.circle(x,y,info.dotRadius,false);
 			}
 		}
 	},
@@ -113,12 +113,12 @@ Chord.prototype = {
 		var width = (this.stringCount-1)*info.cellWidth;
 		for (var i = 0; i <= this.stringCount-1; i++) {
 			var x = info.boxStartX+i*info.cellWidth;
-			r.line(x,info.boxStartY,x,info.boxStartY+this.fretCount*info.cellHeight, info.lineWidth);
+			r.line(x,info.boxStartY,x,info.boxStartY+this.fretCount*info.cellHeight, info.lineWidth, 'square');
 		}
 		
 		for (var i = 0; i <= this.fretCount; i++) {
 			var y = info.boxStartY+i*info.cellHeight;
-			r.line(info.boxStartX,y,info.boxStartX+width,y, info.lineWidth);
+			r.line(info.boxStartX,y,info.boxStartX+width,y, info.lineWidth, 'square');
 		}
 	},
 	
@@ -208,7 +208,7 @@ Chord.prototype = {
 					var xEnd = xStart+bars[fret].length*info.cellWidth;
 					var relativePos = fret - this.startFret+1;
 					var y = info.boxStartY+relativePos*info.cellHeight-(info.cellHeight/2);
-					r.line(xStart,y,xEnd,y, info.dotRadius);
+					r.line(xStart,y,xEnd,y, info.dotRadius, 'square');
 				}
 			}
 
@@ -239,7 +239,7 @@ Chord.prototype = {
 				var xEnd = (this.positions.length-1)*info.cellWidth;
 				var relativePos = barFret - this.startFret+1;
 				var y = info.boxStartY+relativePos*info.cellHeight-(info.cellHeight/2);
-				r.line(xStart,y,xEnd,y, info.dotRadius);
+				r.line(xStart,y,xEnd,y, info.dotRadius, 'square');
 			}
 		}
 	},
@@ -383,6 +383,7 @@ Chord.renderers.svg.prototype = {
 		line.y2.baseVal.value = y2;
 		line.setAttribute('stroke', 'black');
 		line.setAttribute('stroke-width', width);
+		line.setAttribute('stroke-linecap', cap);
 		this.group.appendChild(line);
 	},
 	
