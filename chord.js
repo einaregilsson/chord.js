@@ -15,7 +15,6 @@ Chord.prototype = {
 	init : function(name, positions, fingers) {
 		this.parse(positions, fingers);
 		this.name = name;
-		this.renderer = this.canvasRenderer;
 	},
 	
 	parse : function(frets, fingers) {
@@ -152,7 +151,7 @@ Chord.prototype = {
 		info.font = 'Arial';
 		info.nameFontSize = Math.round(1.8*info.cellHeight);
 		if (scale <= 4) {
-			info.nameFontSize +=2;
+			info.nameFontSize +=3;
 		}
 		info.nameFontPaddingBottom = 4;
 		info.fingerFontSize = Math.round(info.cellHeight*1.2);
@@ -184,7 +183,7 @@ Chord.prototype = {
 	},
 	
 	getDiagram : function(scale, renderer) {
-		this.renderer = Chord.renderers[renderer || 'canvas'];
+		this.renderer = new Chord.renderers[renderer || 'canvas']();
 		this.draw(scale);
 		return this.renderer.diagram();
 	},
@@ -286,7 +285,8 @@ Chord.defaultRenderer = 'canvas';
 
 Chord.renderers = {}; 
 
-Chord.renderers.canvas = {
+Chord.renderers.canvas = function() {}
+Chord.renderers.canvas.prototype = {
 
 	init : function(info) {
 		this.canvas = document.createElement('canvas');
@@ -355,7 +355,8 @@ Chord.renderers.canvas = {
 	}
 };
 
-Chord.renderers.svg = {
+Chord.renderers.svg = function(){ }
+Chord.renderers.svg.prototype = {
 	
 	newElement : function(name) {
 		return document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -386,12 +387,15 @@ Chord.renderers.svg = {
 	},
 	
 	text : function(x,y,text,font,size,baseline,align) {
+		var anchors = { left:'start', right:'end', center:'middle' };
+		var baselines = { middle:'middle', top:'text-before-edge', bottom:'text-after-edge' };
 		var textNode = this.newElement('text');
-		textNode.x.baseVal.value = x;
-		textNode.y.baseVal.value = y;
+		textNode.setAttribute('x', x);
+		textNode.setAttribute('y', y);
 		textNode.setAttribute('font-family', font);
 		textNode.setAttribute('font-size', size + 'px');
-		textNode.setAttribute('baseline', baseline);
+		textNode.setAttribute('text-anchor', anchors[align]);
+		textNode.setAttribute('alignment-baseline', baselines[baseline]);
 		textNode.appendChild(document.createTextNode(text));
 		this.group.appendChild(textNode);
 	},
