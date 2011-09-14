@@ -125,7 +125,7 @@ Chord.prototype = {
 	drawNut : function(info) {
 		var r = this.renderer;
 		if (this.startFret == 1) {
-			r.rect(info.boxStartX, info.boxStartY-info.nutSize,info.boxWidth,info.nutSize,true);
+			r.rect(info.boxStartX, info.boxStartY-info.nutSize,info.boxWidth,info.nutSize);
 		} else {
 			r.text(info.boxStartX-info.dotRadius, info.boxStartY + info.cellHeight / 2.0, this.startFret+'', info.font, info.cellHeight, 'middle', 'right');
 		}
@@ -328,12 +328,9 @@ Chord.renderers.canvas.prototype = {
 		this.ctx.fillText(text,x,y)
 	},
 	
-	rect : function(x,y,width,height,fillRect) {
-		if (fillRect) {
-			this.ctx.fillRect(x-0.5,y-0.5,width+1,height+1);
-		} else {
-			this.ctx.strokeRect(x,y,width,height);
-		}
+	rect : function(x,y,width,height) {
+		var lw = this.ctx.lineWidth;
+		this.ctx.fillRect(x-lw/2.0,y-lw/2.0,width+lw,height+lw);
 	},
 	
 	circle : function(x,y,radius, fillCircle) {
@@ -401,12 +398,90 @@ Chord.renderers.svg.prototype = {
 		this.group.appendChild(textNode);
 	},
 	
-	rect : function(x,y,width,height,fillRect) {
+	rect : function(x,y,width,height) {
 		var rect = this.newElement('rect');
 		rect.x.baseVal.value = x-0.5;
 		rect.y.baseVal.value = y-0.5;
 		rect.width.baseVal.value = width+1;
 		rect.height.baseVal.value = height+1;
+		rect.setAttribute('fill', 'black');
+		this.group.appendChild(rect);
+	},
+	
+	circle : function(x,y,radius, fillCircle) {
+		var circle = this.newElement('circle');
+		circle.cx.baseVal.value = x;
+		circle.cy.baseVal.value = y;
+		circle.r.baseVal.value = radius;
+		if (fillCircle) {
+			circle.setAttribute('fill', 'black');
+		} else {
+			circle.setAttribute('fill', 'white');
+			circle.setAttribute('stroke', 'black');
+		}
+		this.group.appendChild(circle);
+	},
+	
+	diagram : function() {
+		return this.svg;
+	}
+};
+
+Chord.renderers.vml = function(){ }
+Chord.renderers.vml.prototype = {
+	
+	newElement : function(name) {
+		var el = document.createElementNS("urn:schemas-microsoft-com:vml", name);
+		el.style.behavior = 'url(#default#VML)';
+		return el;
+	},
+	
+	init : function(info) {
+		this.rect = this.newElement('rect');
+		this.svg.setAttribute('width', info.width);
+		this.svg.setAttribute('height', info.height);
+		this.svg.setAttribute('style', 'background-color:white;');
+		this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		if (info.lineWidth%2==1) {
+			this.group.setAttribute('transform', 'translate(0.5,0.5)');
+		}
+		this.lineWidth = info.lineWidth;
+		this.group.setAttribute('stroke-linejoin', 'miter');
+		this.svg.appendChild(this.group);
+	},
+	
+	line : function(x1,y1,x2,y2,width,cap) {
+		var line = this.newElement('line');
+		line.x1.baseVal.value = x1;
+		line.x2.baseVal.value = x2;
+		line.y1.baseVal.value = y1;
+		line.y2.baseVal.value = y2;
+		line.setAttribute('stroke', 'black');
+		line.setAttribute('stroke-width', width);
+		line.setAttribute('stroke-linecap', cap);
+		this.group.appendChild(line);
+	},
+	
+	text : function(x,y,text,font,size,baseline,align) {
+		var anchors = { left:'start', right:'end', center:'middle' };
+		var baselines = { middle:'middle', top:'text-before-edge', bottom:'text-after-edge' };
+		var textNode = this.newElement('text');
+		textNode.setAttribute('x', x);
+		textNode.setAttribute('y', y);
+		textNode.setAttribute('font-family', font);
+		textNode.setAttribute('font-size', size + 'px');
+		textNode.setAttribute('text-anchor', anchors[align]);
+		textNode.setAttribute('alignment-baseline', baselines[baseline]);
+		textNode.appendChild(document.createTextNode(text));
+		this.group.appendChild(textNode);
+	},
+	
+	rect : function(x,y,width,height,fillRect) {
+		var rect = this.newElement('rect');
+		rect.x.baseVal.value = x-lineWidth/2.0;
+		rect.y.baseVal.value = y-lineWidth/2.0;
+		rect.width.baseVal.value = width+lineWidth;
+		rect.height.baseVal.value = height+lineWidth;
 		rect.setAttribute('fill', 'black');
 		this.group.appendChild(rect);
 	},
