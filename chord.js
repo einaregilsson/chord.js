@@ -15,6 +15,8 @@ Chord.prototype = {
 	init : function(name, positions, fingers) {
 		this.parse(positions, fingers);
 		this.name = name;
+		this.rawPositions = positions;
+		this.rawFingers = fingers || '';
 	},
 	
 	parse : function(frets, fingers) {
@@ -139,6 +141,9 @@ Chord.prototype = {
 	calculateDimensions : function(scale) {
 		var info ={};
 		info.scale = scale;
+		info.positions = this.rawPositions;
+		info.fingers = this.rawFingers;
+		info.name = this.name;
 		info.cellWidth = scale + 3;
 		info.cellHeight = info.cellWidth;
 		info.nutSize = Math.round(info.cellHeight * 0.4);
@@ -282,6 +287,8 @@ Chord.prototype = {
 
 Chord.defaultSize = 3;
 Chord.defaultRenderer = 'canvas'; 
+Chord.serverSideRenderUrl = '{name}.{format}?p={positions}&s={size}&f={fingers}';
+Chord.serverSideRenderFormat = 'png';
 
 Chord.renderers = {}; 
 
@@ -426,6 +433,32 @@ Chord.renderers.svg.prototype = {
 		return this.svg;
 	}
 };
+
+Chord.renderers.url = function(){ }
+Chord.renderers.url.prototype = {
+	
+	init : function(info) {
+		this.info = info;
+	},
+	
+	line : function(x1,y1,x2,y2,width,cap) {},
+	text : function(x,y,text,font,size,baseline,align) {},
+	rect : function(x,y,width,height,fillRect) {},
+	circle : function(x,y,radius, fillCircle) {},
+	
+	diagram : function() {
+		var img = document.createElement('img');
+		var url = Chord.serverSideRenderUrl
+					.replace('{name}', this.info.name)
+					.replace('{positions}', this.info.positions)
+					.replace('{fingers}', this.info.fingers)
+					.replace('{size}', this.info.scale)
+					.replace('{format}', Chord.serverSideRenderFormat);
+		img.setAttribute('src', url);
+		return img;
+	}
+};
+
 
 Chord.renderers.vml = function(){ }
 Chord.renderers.vml.prototype = {
