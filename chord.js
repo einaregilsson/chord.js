@@ -287,7 +287,7 @@ Chord.prototype = {
 
 Chord.defaultSize = 3;
 Chord.defaultRenderer = 'canvas'; 
-Chord.serverSideRenderUrl = '{name}.{format}?p={positions}&s={size}&f={fingers}';
+Chord.serverSideRenderUrl = 'http://chords.apphb.com/{name}.{format}?p={positions}&s={size}&f={fingers}';
 Chord.serverSideRenderFormat = 'png';
 
 Chord.renderers = {}; 
@@ -449,7 +449,7 @@ Chord.renderers.url.prototype = {
 	diagram : function() {
 		var img = document.createElement('img');
 		var url = Chord.serverSideRenderUrl
-					.replace('{name}', this.info.name)
+					.replace('{name}', escape(this.info.name))
 					.replace('{positions}', this.info.positions)
 					.replace('{fingers}', this.info.fingers)
 					.replace('{size}', this.info.scale)
