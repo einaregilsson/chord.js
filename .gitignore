@@ -4,3 +4,5 @@ dotnet/Chord/*.user
 dotnet/Chord.Web/bin/*
 dotnet/Chord.Web/obj/*
 dotnet/Chord.Web/*.user
+dotnet/Chord.suo
+
