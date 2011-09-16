@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chord", "Chord.csproj", "{60A30AFB-BB23-4B50-BDFA-CA3E8528CE23}"
+# Visual Web Developer Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chord.Web", "Chord.Web\Chord.Web.csproj", "{72EE7FB0-A811-4241-883A-B87718A0013A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chord", "Chord\Chord.csproj", "{60A30AFB-BB23-4B50-BDFA-CA3E8528CE23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,6 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72EE7FB0-A811-4241-883A-B87718A0013A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72EE7FB0-A811-4241-883A-B87718A0013A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72EE7FB0-A811-4241-883A-B87718A0013A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72EE7FB0-A811-4241-883A-B87718A0013A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{60A30AFB-BB23-4B50-BDFA-CA3E8528CE23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{60A30AFB-BB23-4B50-BDFA-CA3E8528CE23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60A30AFB-BB23-4B50-BDFA-CA3E8528CE23}.Release|Any CPU.ActiveCfg = Release|Any CPU

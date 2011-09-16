@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{60A30AFB-BB23-4B50-BDFA-CA3E8528CE23}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Chord</RootNamespace>
     <AssemblyName>Chord</AssemblyName>
@@ -31,15 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Chord.Chord</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Jurassic">
       <HintPath>.\Jurassic.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.JScript" />
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
@@ -47,12 +46,12 @@
     <Compile Include="GdiRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\chord.js">
-      <Link>chord.js</Link>
-    </EmbeddedResource>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <EmbeddedResource Include="..\..\chord.js">
+      <Link>chord.js</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

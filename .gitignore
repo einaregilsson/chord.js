@@ -1,2 +1,6 @@
-dotnet/bin/*
-dotnet/obj/*
+dotnet/Chord/bin/*
+dotnet/Chord/obj/*
+dotnet/Chord/*.user
+dotnet/Chord.Web/bin/*
+dotnet/Chord.Web/obj/*
+dotnet/Chord.Web/*.user

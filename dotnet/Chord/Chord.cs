@@ -44,15 +44,6 @@ namespace Chord
         {
             return (Image)_engine.CallGlobalFunction<object>("createChord", _name, _positions, _fingers, size);
         }
-        
-
-        public static void Main()
-        {
-            var x = new Chord("E", "022100", "231");
-            var img = x.GetDiagram(10);
-            img.Save("D:\\foo.png", ImageFormat.Png);
-            Process.Start("D:\\foo.png");
-        }
     }
 
 }
