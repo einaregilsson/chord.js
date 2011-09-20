@@ -3,6 +3,15 @@
 function Chord(canvas, name, positions, fingering) {
 	this.init(canvas, name, positions, fingering);
 }
+
+//Defaults
+
+Chord.defaultSize = 3;
+Chord.defaultRenderer = 'canvas'; 
+Chord.serverSideRenderUrl = 'http://chords.apphb.com/{name}.{format}?p={positions}&s={size}&f={fingers}';
+Chord.serverSideRenderFormat = 'png';
+Chord.renderOnLoad = true;
+Chord.renderPreference = ['canvas', 'svg', 'vml', 'url'];
 var MUTED = -1;
 
 
@@ -283,12 +292,6 @@ Chord.prototype = {
 	}
 }
 
-//Defaults
-
-Chord.defaultSize = 3;
-Chord.defaultRenderer = 'canvas'; 
-Chord.serverSideRenderUrl = 'http://chords.apphb.com/{name}.{format}?p={positions}&s={size}&f={fingers}';
-Chord.serverSideRenderFormat = 'png';
 
 Chord.renderers = {}; 
 
@@ -538,11 +541,17 @@ Chord.renderers.vml.prototype = {
 	}
 };
 
+Chord.autoRender = function() {
+	if (!Chord.renderOnLoad) {
+		return;
+	}
+	Chord.render(document.getElementsByTagName('span'));
+};
 
 if (document.addEventListener) {
-	document.addEventListener('DOMContentLoaded', function() {
-		Chord.render(document.getElementsByTagName('span'));
-	}, true)
+	document.addEventListener('DOMContentLoaded', Chord.autoRender, true);
+} else if (window.attachEvent) {
+	window.attachEvent('onload', Chord.autoRender);
 }
 
 Chord.render = function(elements) {
@@ -562,3 +571,15 @@ Chord.render = function(elements) {
 		}
 	}
 }
+
+
+//Setup some fallbacks...
+if (!document.createElement('canvas').getContext) {
+	Chord.renderers.canvas = Chord.renderers.url;
+}
+if (!document.createElementNS) {
+	Chord.renderers.svg = Chord.renderers.url;
+}
+
+
+
