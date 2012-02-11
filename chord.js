@@ -93,9 +93,9 @@ Chord.prototype = {
 				y+=info.nutSize;
 			}
 			if (pos == MUTED) {
-				this.drawCross(info,x,y,info.dotRadius);
+				this.drawCross(info,x,y,info.muteStringRadius);
 			} else if (pos == 0) {
-				r.circle(x,y,info.dotRadius,false);
+				r.circle(x,y,info.openStringRadius,false);
 			}
 		}
 	},
@@ -138,7 +138,7 @@ Chord.prototype = {
 		if (this.startFret == 1) {
 			r.rect(info.boxStartX, info.boxStartY-info.nutSize,info.boxWidth,info.nutSize);
 		} else {
-			r.text(info.boxStartX-info.dotRadius, info.boxStartY + info.cellHeight / 2.0, this.startFret+'', info.font, info.cellHeight, 'middle', 'right');
+			r.text(info.boxStartX-info.dotRadius, info.boxStartY + info.cellHeight / 2.0, this.startFret+'', info.font, info.fretFontSize, 'middle', 'right');
 		}
 	},
 	
@@ -147,37 +147,46 @@ Chord.prototype = {
 		r.text(info.width/2.0, 0, this.name, info.font, info.nameFontSize, 'top', 'center');
 	},
 	
+	//It's better to specify this explicitly. Trying to scale in a nice way to doesn't works so well.
+	sizes : {
+		cellWidth 				: [ 4,  6,  8, 10, 12, 14, 16, 18, 20, 22], 
+		nutSize 				: [ 2,  3,  4,  5,  6,  7,  ,  9,], 
+		lineWidth 				: [ 1,  1,  1,  1,  1,  2], 
+		dotRadius 				: [ 2,  3,  4,  5,  6,  6], 
+		openStringRadius		: [ 1,  2,  3,  4,  5,  5], 
+		muteStringRadius 		: [ 2,  3,  4,  5,  6,  7], 
+		nameFontSize			: [12, 16, 20, 24, 28, 32], 
+		nameFontPaddingBottom 	: [ 4,  4,  5,  4,  4,  4], 
+		fingerFontSize 			: [ 7,  8,  9, 11, 13, 13],
+		fretFontSize			: [ 6,  8, 10, 12, 14, 14]
+		
+	},
+	
 	calculateDimensions : function(scale) {
-		var info ={};
+		var info = {};
+		scale--;
+		for (var name in this.sizes) {
+			info[name] = this.sizes[name][scale];
+		}
+
 		info.scale = scale;
 		info.positions = this.rawPositions;
 		info.fingers = this.rawFingers;
 		info.name = this.name;
-		info.cellWidth = scale + 3;
+		//info.cellWidth = scale + 3;
 		info.cellHeight = info.cellWidth;
-		info.nutSize = Math.round(info.cellHeight * 0.4);
-		info.lineWidth = Math.max(1.0,Math.floor(info.cellHeight/6.0));
-		info.dotRadius = info.cellWidth/2-1;
-		if (scale <= 4) {
-			info.dotRadius++;
-		}
+		//info.nutSize = Math.round(info.cellHeight * 0.4);
+		//info.lineWidth = Math.max(1.0,Math.floor(info.cellHeight/6.0));
+		//info.dotRadius = info.cellWidth/2-3;
 		info.dotWidth = 2*info.dotRadius;
 		info.font = 'Arial';
-		info.nameFontSize = Math.round(1.8*info.cellHeight);
-		if (scale <= 4) {
-			info.nameFontSize +=3;
-		}
-		info.nameFontPaddingBottom = 4;
-		info.fingerFontSize = Math.round(info.cellHeight*1.2);
-		if (scale <= 4) {
-			info.fingerFontSize++;
-		}
-		if (scale == 1) {
-			info.fingerFontSize++;
-		}
+		//info.nameFontSize = Math.round(1.8*info.cellHeight);
+		//info.nameFontPaddingBottom = 4;
+		//info.fingerFontSize = Math.round(info.cellHeight*1.2);
+
 		info.boxWidth = (this.stringCount-1)*info.cellWidth;
 		info.boxHeight = (this.fretCount)*info.cellHeight;
-		info.width = info.boxWidth + 3*info.cellWidth;
+		info.width = info.boxWidth + 4*info.cellWidth;
 		info.height = info.nameFontSize + info.nameFontPaddingBottom + info.dotWidth + info.nutSize + info.boxHeight + info.fingerFontSize + 2;
 		info.boxStartX = Math.round(((info.width-info.boxWidth)/2));
 		info.boxStartY = Math.round(info.nameFontSize + info.nameFontPaddingBottom + info.nutSize + info.dotWidth);	
@@ -261,10 +270,7 @@ Chord.prototype = {
 	drawCross : function(info, x, y, radius) {
 		var r = this.renderer;
 		var angle = Math.PI/4
-		var lineWidth = info.lineWidth;
-		if (info.scale > 2 ) {
-			lineWidth *= 1.2;
-		}
+		var lineWidth = info.lineWidth*1.05;
 		for (var i = 0; i < 2; i++) {
 			var startAngle = angle + i*Math.PI/2;
 			var endAngle = startAngle + Math.PI;
@@ -346,7 +352,6 @@ Chord.renderers.canvas.prototype = {
 	circle : function(x,y,radius, fillCircle) {
 		var c = this.ctx;
 		c.beginPath();
-		radius = Math.floor(radius) ;
 		c.arc(x,y,radius,2*Math.PI,false)
 		if (fillCircle) {
 			c.fill();
