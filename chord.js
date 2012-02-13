@@ -136,7 +136,7 @@ Chord.prototype = {
 	drawNut : function(info) {
 		var r = this.renderer;
 		if (this.startFret == 1) {
-			r.rect(info.boxStartX, info.boxStartY-info.nutSize,info.boxWidth,info.nutSize);
+			r.rect(info.boxStartX, info.boxStartY-info.nutSize,info.boxWidth,info.nutSize, info.lineWidth);
 		} else {
 			r.text(info.boxStartX-info.dotRadius, info.boxStartY + info.cellHeight / 2.0, this.startFret+'', info.font, info.fretFontSize, 'middle', 'right');
 		}
@@ -173,17 +173,9 @@ Chord.prototype = {
 		info.positions = this.rawPositions;
 		info.fingers = this.rawFingers;
 		info.name = this.name;
-		//info.cellWidth = scale + 3;
 		info.cellHeight = info.cellWidth;
-		//info.nutSize = Math.round(info.cellHeight * 0.4);
-		//info.lineWidth = Math.max(1.0,Math.floor(info.cellHeight/6.0));
-		//info.dotRadius = info.cellWidth/2-3;
 		info.dotWidth = 2*info.dotRadius;
 		info.font = 'Arial';
-		//info.nameFontSize = Math.round(1.8*info.cellHeight);
-		//info.nameFontPaddingBottom = 4;
-		//info.fingerFontSize = Math.round(info.cellHeight*1.2);
-
 		info.boxWidth = (this.stringCount-1)*info.cellWidth;
 		info.boxHeight = (this.fretCount)*info.cellHeight;
 		info.width = info.boxWidth + 4*info.cellWidth;
@@ -344,9 +336,8 @@ Chord.renderers.canvas.prototype = {
 		this.ctx.fillText(text,x,y)
 	},
 	
-	rect : function(x,y,width,height) {
-		var lw = this.ctx.lineWidth;
-		this.ctx.fillRect(x-lw/2.0,y-lw/2.0,width+lw,height+lw);
+	rect : function(x,y,width,height, lineWidth) {
+		this.ctx.fillRect(x-lineWidth/2.0,y-lineWidth/2.0,width+lineWidth,height+lineWidth);
 	},
 	
 	circle : function(x,y,radius, fillCircle) {
@@ -413,12 +404,12 @@ Chord.renderers.svg.prototype = {
 		this.group.appendChild(textNode);
 	},
 	
-	rect : function(x,y,width,height) {
+	rect : function(x,y,width,height, lineWidth) {
 		var rect = this.newElement('rect');
-		rect.x.baseVal.value = x-0.5;
-		rect.y.baseVal.value = y-0.5;
-		rect.width.baseVal.value = width+1;
-		rect.height.baseVal.value = height+1;
+		rect.x.baseVal.value = x-lineWidth/2.0;
+		rect.y.baseVal.value = y-lineWidth/2.0;
+		rect.width.baseVal.value = width+lineWidth;
+		rect.height.baseVal.value = height+lineWidth;
 		rect.setAttribute('fill', 'black');
 		this.group.appendChild(rect);
 	},
