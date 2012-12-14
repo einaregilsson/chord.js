@@ -89,9 +89,9 @@ Chord.prototype = {
                 y += info.nutSize;
             }
             if (pos == MUTED) {
-                this.drawCross(info, x, y, info.muteStringRadius);
+                this.drawCross(info, x, y, info.muteStringRadius, info.muteStringLineWidth);
             } else if (pos == 0) {
-                r.circle(x, y, info.openStringRadius, false);
+                r.circle(x, y, info.openStringRadius, false, info.openStringLineWidth);
             }
         }
     },
@@ -148,11 +148,13 @@ Chord.prototype = {
         cellWidth: 				[4,   6,  8,  10, 12, 14, 16, 18, 20, 22],
         nutSize: 				[2,   3,  4,   5,  6,  7,  8,  9, 10, 11],
         lineWidth:  			[1,   1,  1,   1,  1,  1,  2,  2,  2,  2],
-        barWidth:   			[2,   3,  3,   5,  5,  7,  8,  8, 10, 10],
+        barWidth:   			[2.5,   3,  5,   7,  7,  9,  10,  10, 12, 12],
         dotRadius:  			[2,   2.8,  3.7, 4.5,  5.3,  6.5,  7,  8,  9, 10],
-        openStringRadius: 		[1.4,   2,  3,   4,  5,  5,  6,  7,  5.5,  6.5],
-        muteStringRadius: 		[2,   3,  4,   5,  6,  7,  8,  9, 10, 11],
-        nameFontSize: 			[12, 16, 20,  24, 28, 32, 36, 40, 44, 48],
+        openStringRadius: 		[1.5,   2,  2.5,   3,  3.5,  4,  4.5,  5,  5.5,  6.5],
+        openStringLineWidth: 	[1,   1.2,  1.2,   1.4,  1.4,  1.4,  1.6,  2,  2,  2],
+        muteStringRadius: 		[2,   2.5,  3,   3.5,  4,  4.5,  5,  5.5, 6, 6.5],
+        muteStringLineWidth:	[1.05,   1.1,  1.1,   1.2,  1.5,  1.5,  1.5,  2,  2.4,  2.5],
+		nameFontSize: 			[12, 16, 20,  24, 28, 32, 36, 40, 44, 48],
         nameFontPaddingBottom: 	[4,   4,  5,   4,  4,  4,  5,  5,  5,  5],
         fingerFontSize: 		[7,   8,  9,  11, 13, 14, 15, 18, 20, 22],
         fretFontSize: 			[6,   8, 10,  12, 14, 14, 16, 17, 18, 19]
@@ -219,6 +221,7 @@ Chord.prototype = {
                     var xEnd = xStart + bars[fret].length * info.cellWidth;
                     var relativePos = fret - this.startFret + 1;
                     var y = info.boxStartY + relativePos * info.cellHeight - (info.cellHeight / 2);
+					console.log('y: ' + y + ', barWidth: ' + info.barWidth);
                     r.line(xStart, y, xEnd, y, info.barWidth, 'square');
                 }
             }
@@ -255,10 +258,9 @@ Chord.prototype = {
         }
     },
 
-    drawCross: function (info, x, y, radius) {
+    drawCross: function (info, x, y, radius, lineWidth) {
         var r = this.renderer;
         var angle = Math.PI / 4
-        var lineWidth = info.lineWidth * 1.05;
         for (var i = 0; i < 2; i++) {
             var startAngle = angle + i * Math.PI / 2;
             var endAngle = startAngle + Math.PI;
@@ -335,13 +337,14 @@ Chord.renderers.canvas = {
 		this.ctx.fillRect(x-lineWidth/2.0,y-lineWidth/2.0,width+lineWidth,height+lineWidth);
 	},
 	
-	circle : function(x,y,radius, fillCircle) {
+	circle : function(x,y,radius, fillCircle, lineWidth) {
 		var c = this.ctx;
 		c.beginPath();
 		c.arc(x,y,radius,2*Math.PI,false)
 		if (fillCircle) {
 			c.fill();
 		} else {
+			c.lineWidth = lineWidth;
 			c.stroke();
 		}
 	},
