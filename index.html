@@ -5,8 +5,49 @@
 			body { background-color:#eee; font-family:Arial, sans-serif; }
 		</style>
 		<script src="chord.js"></script>
+		<script>
+			function show() {
+				var input = document.getElementsByTagName('input')[0];
+				if (!document.location.search) {
+					return;
+				}
+				var val = unescape(document.location.search.substr('?chord='.length)).replace(/\+/g, ' ');
+				var div = document.getElementById('generated-chords');
+				input.value = val;
+				var sp = val.indexOf(' ');
+				var name = val.substr(0, sp);
+				var chord = val.substr(sp+1);
+				div.innerHTML = '';
+				for (var i = 1; i <= 10; i++) {
+					var span = document.createElement('Span');
+					span.innerHTML = name;
+					span.setAttribute('data-chord', chord + ' ' + i);
+					div.appendChild(span);
+					Chord.render([span]);
+				}
+			}
+		</script>
 	</head>
-	<body>
+	<body onload="show()">
+		<div id="generated-chords">
+		</div>
+		<form method="GET">
+		<input name="chord" type="text"/>
+		<input type="submit" value="Show chord in all sizes" />
+		<!--
+		<span data-chord="x46654 [13421] 1">C#m</span> 
+		<span data-chord="x46654 [13421] 2">C#m</span> 
+		<span data-chord="x46654 [13421] 3">C#m</span> 
+		<span data-chord="x46654 [13421] 4">C#m</span> 
+		<span data-chord="x46654 [13421] 5">C#m</span> 
+		<span data-chord="x46654 [13421] 6">C#m</span> 
+		<span data-chord="x46654 [13421] 7">C#m</span> 
+		<span data-chord="x46654 [13421] 8">C#m</span> 
+		<span data-chord="x46654 [13421] 9">C#m</span> 
+		<span data-chord="x46654 [13421] 10">C#m</span> 
+	
+	
+	
 		<span data-chord="320033 [2134] 1">G</span> 
 		<span data-chord="x32010 [321] 2">C</span> 
 		<span data-chord="xx0232 [132] 3">D</span> 
@@ -18,9 +59,10 @@
 		<span data-chord="x7678x [2134] 9">E7#9</span> 
 		<span data-chord="577555 [134111] 10">Am</span> 
 		<span data-chord="xx0231 [231] 12">Dm</span> 
-
+-->
 		<!--Ukulele chords are the same, just use 4 strings instead of 6. We render them with only 4 frets, the diagrams look better that way-->
 		We can also render Ukuelele chords. Here are a few:
+		<!--
 		<span data-chord="0003 [3] 2">C</span> 
 		<span data-chord="0432 [321] 2">Em</span> 
 		<span data-chord="2010 [321] 2">F</span> 
@@ -29,5 +71,6 @@
 		<span data-chord="0232">G</span> 
 		<span data-chord="1202 [123] 5">E7</span> 
 		<span data-chord="0212 [213] 7">G7</span> 
+	-->
 	</body>
 </html>
