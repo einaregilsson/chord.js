@@ -145,19 +145,19 @@ Chord.prototype = {
 
     //It's better to specify this explicitly. Trying to scale in a nice way to doesn't works so well.
     sizes: {
-        cellWidth: 				[4,   6,  8,  10, 12, 14, 16, 18, 20, 22],
-        nutSize: 				[2,   3,  4,   5,  6,  7,  8,  9, 10, 11],
-        lineWidth:  			[1,   1,  1,   1,  1,  1,  2,  2,  2,  2],
-        barWidth:   			[2.5,   3,  5,   7,  7,  9,  10,  10, 12, 12],
-        dotRadius:  			[2,   2.8,  3.7, 4.5,  5.3,  6.5,  7,  8,  9, 10],
-        openStringRadius: 		[1.5,   2,  2.5,   3,  3.5,  4,  4.5,  5,  5.5,  6.5],
-        openStringLineWidth: 	[1,   1.2,  1.2,   1.4,  1.4,  1.4,  1.6,  2,  2,  2],
-        muteStringRadius: 		[2,   2.5,  3,   3.5,  4,  4.5,  5,  5.5, 6, 6.5],
-        muteStringLineWidth:	[1.05,   1.1,  1.1,   1.2,  1.5,  1.5,  1.5,  2,  2.4,  2.5],
-		nameFontSize: 			[12, 16, 20,  24, 28, 32, 36, 40, 44, 48],
-        nameFontPaddingBottom: 	[4,   4,  5,   4,  4,  4,  5,  5,  5,  5],
-        fingerFontSize: 		[7,   8,  9,  11, 13, 14, 15, 18, 20, 22],
-        fretFontSize: 			[6,   8, 10,  12, 14, 14, 16, 17, 18, 19]
+        cellWidth: 				[   4,   6,   8,  10,  12,  14,  16,  18,  20,  22],
+        nutSize: 				[   2,   3,   4,   5,   6,   7,   8,   9,  10,  11],
+        lineWidth:  			[   1,   1,   1,   1,   1,   1,   2,   2,   2,   2],
+        barWidth:   			[ 2.5,   3,   5,   7,   7,   9,  10,  10,  12,  12],
+        dotRadius:  			[   2, 2.8, 3.7, 4.5, 5.3, 6.5,   7,   8,   9,  10],
+        openStringRadius: 		[ 1.5,   2, 2.5,   3, 3.5,   4, 4.5,   5, 5.5, 6.5],
+        openStringLineWidth: 	[   1, 1.2, 1.2, 1.4, 1.4, 1.4, 1.6,   2,   2,   2],
+        muteStringRadius: 		[   2, 2.5,   3, 3.5,   4, 4.5,   5, 5.5,   6, 6.5],
+        muteStringLineWidth:	[1.05, 1.1, 1.1, 1.2, 1.5, 1.5, 1.5,   2, 2.4, 2.5],
+		nameFontSize: 			[  10,  14,  18,  22,  26,  32,  36,  40,  44,  48],
+        nameFontPaddingBottom: 	[   4,   4,   5,   4,   4,   4,   5,   5,   5,   5],
+        fingerFontSize: 		[   7,   8,   9,  11,  13,  14,  15,  18,  20,  22],
+        fretFontSize: 			[   6,   8,  10,  12,  14,  14,  16,  17,  18,  19]
     },
 
     calculateDimensions: function (scale) {
