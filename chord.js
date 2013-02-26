@@ -14,19 +14,11 @@ var MUTED = -1;
 //Matches a named chord with optional fingerings
 //              |Small      |Large chord with seperators            |        |Optional|
 //              |Chord      |dashes, dots or spaces                 |        |Fingerings
-Chord.regex = /([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|\d\d?)){3,5})\b(?:\s*\[([T\d]+)\])?(?:\s+(\d+))?/g;
-
+Chord.regex = /^([0-9xX]{4,6}|(?:x|X|\d\d?)(?:[-\. ](?:x|X|\d\d?)){3,5})(?:\s*\[([T\d]+)\])?(?:\s*(\d+))?/g;
 Chord.patterns = {
-	positions : '\\b([0-9xX]{4,6}|(?:x|X|\\d\\d?)(?:[-\\. ](?:x|\\d\\d?)){3,5})',
-	fingers : '(?:\\s*\\[([T\d]+)\\])?',
-	size : '(?:\\s*(\\d+))?',
-	name : '([ABCDEFG](?:[a-z0-9#)*)\b'
+	name : '([ABCDEFG](?:[a-z0-9#])*)\\b'
 }
 
-Chord.regexes = {
-	justChord : new RegEx(Chord.patterns.positions + Chord.patterns.fingers + Chord.patterns.size, 'g');
-	namedChord : new RegEx(Chord.patterns.name + Chord.patterns.positions + Chord.patterns.fingers + Chord.patterns.size, 'g');
-}
 
 Chord.prototype = {
     init: function (name, positions, fingers) {
