@@ -140,7 +140,7 @@ Chord.prototype = {
 
 	drawName: function (info) {
 		var r = this.renderer;
-		r.text(info.width / 2.0, 0, this.name, info.font, info.nameFontSize, 'top', 'center');
+		r.text(info.width / 2.0, info.nameFontSize + info.lineWidth*3, this.name, info.font, info.nameFontSize, 'bottom', 'center');
 	},
 
 	//It's better to specify this explicitly. Trying to scale in a nice way to doesn't works so well.
@@ -177,7 +177,7 @@ Chord.prototype = {
 		info.boxWidth = (this.stringCount - 1) * info.cellWidth;
 		info.boxHeight = (this.fretCount) * info.cellHeight;
 		info.width = info.boxWidth + 4 * info.cellWidth;
-		info.height = info.nameFontSize + info.nameFontPaddingBottom + info.dotWidth + info.nutSize + info.boxHeight + info.fingerFontSize + 2;
+		info.height = info.nameFontSize + info.nameFontPaddingBottom + info.dotWidth + info.nutSize + info.boxHeight + info.fingerFontSize + 4;
 		info.boxStartX = Math.round(((info.width - info.boxWidth) / 2));
 		info.boxStartY = Math.round(info.nameFontSize + info.nameFontPaddingBottom + info.nutSize + info.dotWidth);
 		return info;
@@ -280,9 +280,9 @@ Chord.prototype = {
 		for (var i in this.fingerings) {
 			var finger = this.fingerings[i]
 			var x = info.boxStartX + i * info.cellWidth;
-			var y = info.boxStartY + info.boxHeight;
+			var y = info.boxStartY + info.boxHeight + fontSize + info.lineWidth + 1;
 			if (finger) {
-				r.text(x, y, finger, info.font, fontSize, 'top', 'center');
+				r.text(x, y, finger, info.font, fontSize, 'bottom', 'center');
 			}
 		}
 	}
@@ -323,6 +323,7 @@ Chord.renderers.canvas = {
 		c.moveTo(x1,y1);
 		c.lineTo(x2,y2);
 		c.stroke();
+		console.log('x1 ' + x1 + ', x2 ' + x2 + ' y1 ' + y1 + ' y2 ' + y2 + ' width: ' +width);
 		c.restore();
 	},
 	
