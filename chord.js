@@ -224,7 +224,7 @@ Chord.prototype = {
                     var xEnd = xStart + bars[fret].length * info.cellWidth;
                     var relativePos = fret - this.startFret + 1;
                     var y = info.boxStartY + relativePos * info.cellHeight - (info.cellHeight / 2);
-                    console.log('y: ' + y + ', barWidth: ' + info.barWidth);
+                    //console.log('y: ' + y + ', barWidth: ' + info.barWidth);
                     r.line(xStart, y, xEnd, y, info.barWidth, 'square');
                 }
             }
@@ -326,7 +326,7 @@ Chord.renderers.canvas = {
         c.moveTo(x1,y1);
         c.lineTo(x2,y2);
         c.stroke();
-        console.log('x1 ' + x1 + ', x2 ' + x2 + ' y1 ' + y1 + ' y2 ' + y2 + ' width: ' +width);
+        //console.log('x1 ' + x1 + ', x2 ' + x2 + ' y1 ' + y1 + ' y2 ' + y2 + ' width: ' +width);
         c.restore();
     },
     
