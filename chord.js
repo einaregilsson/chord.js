@@ -364,7 +364,7 @@ Chord.autoRender = function() {
     if (!Chord.renderOnLoad) {
         return;
     }
-    Chord.render(document.getElementsByTagName('span'));
+    Chord.render(document.querySelectorAll('[data-chord]'));
 };
 
 if (document.addEventListener) {
