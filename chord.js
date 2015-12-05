@@ -373,11 +373,20 @@ if (document.addEventListener) {
     window.attachEvent('onload', Chord.autoRender);
 }
 
-Chord.render = function(elements) {
+Chord.render = function(input) {
     
-    for (var i = 0; i < elements.length; i++) {
-        var el = elements[i];
+    var array = [];
+
+    if( Object.prototype.toString.call( input ) === '[object Array]' ) {
+        array = input;
+    }else{
+        array.push(input);
+    }
+
+    for (var i = 0; i < array.length; i++) {
+        var el = array[i];
         var chordDef = el.getAttribute('data-chord');
+
         var chordName = el.firstChild.nodeValue;
         if (chordDef && chordDef.match(Chord.regex)) {
             var size = Chord.defaultSize;
