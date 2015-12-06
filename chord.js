@@ -1,3 +1,6 @@
+/*
+chord.js v1.0.0 | MIT | Einar Egilsson 2015 | http://einaregilsson.com
+*/
 ﻿
 function Chord(canvas, name, positions, fingering) {
     this.init(canvas, name, positions, fingering);
@@ -221,7 +224,7 @@ Chord.prototype = {
                     var xEnd = xStart + bars[fret].length * info.cellWidth;
                     var relativePos = fret - this.startFret + 1;
                     var y = info.boxStartY + relativePos * info.cellHeight - (info.cellHeight / 2);
-                    console.log('y: ' + y + ', barWidth: ' + info.barWidth);
+                    //console.log('y: ' + y + ', barWidth: ' + info.barWidth);
                     r.line(xStart, y, xEnd, y, info.barWidth, 'square');
                 }
             }
@@ -323,7 +326,7 @@ Chord.renderers.canvas = {
         c.moveTo(x1,y1);
         c.lineTo(x2,y2);
         c.stroke();
-        console.log('x1 ' + x1 + ', x2 ' + x2 + ' y1 ' + y1 + ' y2 ' + y2 + ' width: ' +width);
+        //console.log('x1 ' + x1 + ', x2 ' + x2 + ' y1 ' + y1 + ' y2 ' + y2 + ' width: ' +width);
         c.restore();
     },
     
@@ -361,7 +364,7 @@ Chord.autoRender = function() {
     if (!Chord.renderOnLoad) {
         return;
     }
-    Chord.render(document.getElementsByTagName('span'));
+    Chord.render(document.querySelectorAll('[data-chord]'));
 };
 
 if (document.addEventListener) {
@@ -370,11 +373,20 @@ if (document.addEventListener) {
     window.attachEvent('onload', Chord.autoRender);
 }
 
-Chord.render = function(elements) {
+Chord.render = function(input) {
     
-    for (var i = 0; i < elements.length; i++) {
-        var el = elements[i];
+    var array = [];
+
+    if( Object.prototype.toString.call( input ) === '[object Array]' ) {
+        array = input;
+    }else{
+        array.push(input);
+    }
+
+    for (var i = 0; i < array.length; i++) {
+        var el = array[i];
         var chordDef = el.getAttribute('data-chord');
+
         var chordName = el.firstChild.nodeValue;
         if (chordDef && chordDef.match(Chord.regex)) {
             var size = Chord.defaultSize;
